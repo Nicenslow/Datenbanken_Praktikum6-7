@@ -42,14 +42,17 @@ public class HochschuleTable {
 		setNumberRows();
 		daten = new String[numrows][numcols];
 		rset.beforeFirst();
-		for (int i = 0; i < numrows; i++) {
-			for (int k = 0; k < numcols ; k++) {
-				rset.next();
-				daten[i][k] = rset.getString(1);
+		for (int i = 0; i < numcols; i++) {
+			for (int k = 0; k < numrows ; k++) {
+				if(rset.next()){
+					
+				daten[k][i] = (rset.getString(i+1) == null) ? "null":rset.getString(i+1) ;
+				System.out.println(daten[k][i].toString());
+				}
 			}
-
+			rset.beforeFirst();
 		}
-		rset.beforeFirst();
+		
 	}
 
 	public JTable getTable() {

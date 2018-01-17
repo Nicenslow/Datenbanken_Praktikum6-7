@@ -30,6 +30,7 @@ public class HochschuleFrame {
 	ResultSetMetaData rsetmd;
 	ArrayList<String> tabellenNamen;
 	JComboBox tabellenauswahl;
+	JScrollPane tabellenscroll;
 
 	public HochschuleFrame() throws ClassNotFoundException, SQLException, IOException {
 		JFrame fenster = new JFrame("Datenbank Tabellen");
@@ -40,15 +41,19 @@ public class HochschuleFrame {
 		getUserLogin();
 		connect();
 		getMetaTablefirstColumn() ;
-	
+		int defaulttable = 0;
+		tabellenscroll = new JScrollPane();
 	 tabellenauswahl = new JComboBox<String>( tabellenNamen.toArray(new String[tabellenNamen.size()]));
 		tabellenauswahl.addActionListener( event ->{
 				JComboBox<String> comboBox = (JComboBox) event.getSource();
-				Object selected = comboBox.getSelectedItem();
-				
+				Object selected = comboBox.getSelectedItem();		
 					try {
 						hochschultabelle = new HochschuleTable(selected, con);
-						panel.add(hochschultabelle.getTable(), BorderLayout.CENTER);
+						tabellenscroll.setViewportView(hochschultabelle.getTable());
+						panel.add(tabellenscroll, BorderLayout.CENTER);
+						panel.revalidate();
+						fenster.pack();
+	
 					} catch (ClassNotFoundException | SQLException | IOException e) {
 						System.out.println("Fehler beim Erstellen der Tabelle");
 		
