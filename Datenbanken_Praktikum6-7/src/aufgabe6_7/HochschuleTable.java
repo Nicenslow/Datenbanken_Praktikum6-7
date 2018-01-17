@@ -41,13 +41,15 @@ public class HochschuleTable {
 		numcols = rsetmd.getColumnCount();
 		setNumberRows();
 		daten = new String[numrows][numcols];
-
+		rset.beforeFirst();
 		for (int i = 0; i < numrows; i++) {
-			for (int k = 0; k < numcols + 1; k++) {
-				daten[i][k] = rset.getString(k + 1);
+			for (int k = 0; k < numcols ; k++) {
+				rset.next();
+				daten[i][k] = rset.getString(1);
 			}
 
 		}
+		rset.beforeFirst();
 	}
 
 	public JTable getTable() {
@@ -62,7 +64,7 @@ public class HochschuleTable {
 		return columnNames;
 	}
 
-	private void setNumberRows() {
+	private void setNumberRows() throws SQLException {
 		try {
 
 			if (rset.last()) {
@@ -75,11 +77,12 @@ public class HochschuleTable {
 			System.out.println("Error getting row count");
 			e.printStackTrace();
 		}
+		rset.beforeFirst();
 	}
 
 	public void selectAllDatafromTable() throws SQLException, ClassNotFoundException, IOException {
 		Statement stmt;
-		stmt = con.createStatement();
+		stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 		rset = stmt.executeQuery("Select * from " + query);
 		rsetmd = rset.getMetaData();
 	}

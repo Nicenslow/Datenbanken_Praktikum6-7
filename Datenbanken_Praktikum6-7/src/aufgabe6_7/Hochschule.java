@@ -11,6 +11,6 @@ import javax.swing.table.TableModel;
 public class Hochschule {
 	
 	public static void main(String[] args) throws ClassNotFoundException, SQLException, IOException{
-		HochschuleFrame App = new HochschuleFrame();
+		 new HochschuleFrame();
 	}
 }

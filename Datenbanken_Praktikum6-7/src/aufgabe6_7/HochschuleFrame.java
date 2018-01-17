@@ -10,6 +10,8 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.sql.rowset.CachedRowSet;
 import javax.swing.JComboBox;
@@ -26,7 +28,7 @@ public class HochschuleFrame {
 	ResultSet rset;
 	HochschuleTable hochschultabelle;
 	ResultSetMetaData rsetmd;
-	String[] tabellenNamen;
+	ArrayList<String> tabellenNamen;
 	JComboBox tabellenauswahl;
 
 	public HochschuleFrame() throws ClassNotFoundException, SQLException, IOException {
@@ -37,15 +39,16 @@ public class HochschuleFrame {
 		panel.setLayout(new BorderLayout());
 		getUserLogin();
 		connect();
-		
-	 tabellenauswahl = new JComboBox<String>(getMetaTablefirstColumn());
-		tabellenauswahl.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent event) {
+		getMetaTablefirstColumn() ;
+	
+	 tabellenauswahl = new JComboBox<String>( tabellenNamen.toArray(new String[tabellenNamen.size()]));
+		tabellenauswahl.addActionListener( event ->{
 				JComboBox<String> comboBox = (JComboBox) event.getSource();
 				Object selected = comboBox.getSelectedItem();
 				
 					try {
 						hochschultabelle = new HochschuleTable(selected, con);
+						panel.add(hochschultabelle.getTable(), BorderLayout.CENTER);
 					} catch (ClassNotFoundException | SQLException | IOException e) {
 						System.out.println("Fehler beim Erstellen der Tabelle");
 		
@@ -53,10 +56,9 @@ public class HochschuleFrame {
 					}
 			
 
-			}
+			
 		});
-
-		panel.add(hochschultabelle.getTable(), BorderLayout.CENTER);
+		panel.add(tabellenauswahl, BorderLayout.NORTH);
 		fenster.getContentPane().add(panel);
 
 		fenster.pack();
@@ -71,29 +73,25 @@ public class HochschuleFrame {
 	}
 
 	public void connect() throws SQLException, ClassNotFoundException, IOException {
+		Class.forName("oracle.jdbc.driver.OracleDriver");
 		DriverManager.registerDriver(new oracle.jdbc.driver.OracleDriver());
 		con = DriverManager.getConnection("jdbc:oracle:thin:@ora14.informatik.haw-hamburg.de:1521:inf14", user,
 				password);
 	}
 
-	public String[] getMetaTablefirstColumn() throws SQLException, ClassNotFoundException, IOException {
+	public void getMetaTablefirstColumn() throws SQLException, ClassNotFoundException, IOException {
 		stmt = con.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
 		rset = stmt.executeQuery("Select Table_Name from user_tables"); // hier
-																		// richtiges
-		int rows = 0;
-		while(rset.next()){
-			rows ++;
+				
+			tabellenNamen = new ArrayList<String>();
+		while (rset.next()) {
+			tabellenNamen.add(rset.getString(1));
+			
 		}
 		rset.beforeFirst();
-		tabellenNamen = new String[rows];
-
-		int i = 0;
-		while (rset.next()) {
-			tabellenNamen[i] = rset.getString(i + 1);
-		}
-		return tabellenNamen;
 	}
 
+	
 	public void closeConnection() throws SQLException {
 		con.close();
 	}
