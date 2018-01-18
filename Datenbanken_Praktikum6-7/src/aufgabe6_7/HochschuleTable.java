@@ -47,7 +47,6 @@ public class HochschuleTable {
 				if(rset.next()){
 					
 				daten[k][i] = (rset.getString(i+1) == null) ? "null":rset.getString(i+1) ;
-				System.out.println(daten[k][i].toString());
 				}
 			}
 			rset.beforeFirst();
